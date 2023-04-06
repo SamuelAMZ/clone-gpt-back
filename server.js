@@ -9,6 +9,7 @@ const timeout = require("connect-timeout");
 // app routes
 const NewShareRoute = require("./routes/app/newShare");
 const SingleShareRoute = require("./routes/app/singleShare");
+const userchatsRoute = require("./routes/app/userChats");
 
 // auth routes
 const NewUserRoute = require("./routes/auth/newUser");
@@ -83,6 +84,14 @@ app.use("/api/single-share", SingleShareRoute);
     @endpoint: /api/single-share
 */
 app.use("/api/new-user", NewUserRoute);
+
+/*   
+    @desc: single user chats
+    @method: POST
+    @privacy: public
+    @endpoint: /api/user-chats
+*/
+app.use("/api/user-chats", userchatsRoute);
 
 app.listen(process.env.PORT, () =>
   console.log(`app listen on port ${process.env.PORT}`)

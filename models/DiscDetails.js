@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const DiscDetails = new mongoose.Schema(
   {
+    uid: {
+      type: String,
+    },
     slug: {
       type: String,
     },
@@ -10,6 +13,10 @@ const DiscDetails = new mongoose.Schema(
     },
     url: {
       type: String,
+    },
+    isPrivate: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
