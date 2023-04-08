@@ -9,18 +9,18 @@ const Discussions = require("../../models/Discussions");
 const Joi = require("@hapi/joi");
 
 const schema = Joi.object({
-  slug: Joi.string().required(),
+  id: Joi.string().required(),
   page: Joi.string().required(),
   perPage: Joi.string().required(),
 });
 
 SingleShareRoute.post("/", async (req, res) => {
-  const { slug, page, perPage } = req.body;
+  const { id, page, perPage } = req.body;
 
   // joi validation sbody data
   try {
     const validation = await schema.validateAsync({
-      slug,
+      id,
       page,
       perPage,
     });
@@ -31,7 +31,7 @@ SingleShareRoute.post("/", async (req, res) => {
 
   //   search for slug in discDetails collection
   try {
-    const singleShare = await DiscDetails.findOne({ slug: slug });
+    const singleShare = await DiscDetails.findOne({ _id: id });
     if (!singleShare) {
       return res.status(400).json({
         message: `single share not found`,

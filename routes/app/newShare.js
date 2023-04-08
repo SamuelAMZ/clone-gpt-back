@@ -49,7 +49,7 @@ NewShareRoute.post("/", async (req, res) => {
     await aShare.save();
 
     // add url
-    aShare.url = `${process.env.PUBLINK}/disc/${aShare.slug}`;
+    aShare.url = `${process.env.PUBLINK}/disc/${aShare._id}`;
     await aShare.save();
   } catch (error) {
     console.log(error);
@@ -74,7 +74,7 @@ NewShareRoute.post("/", async (req, res) => {
     return res.status(201).json({
       message: "added successfully",
       code: "ok",
-      payload: { url: aShare.url },
+      payload: { url: `${process.env.PUBLINK}/disc/${aShare._id}` },
     });
   } catch (error) {
     console.log(error);
