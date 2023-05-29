@@ -11,6 +11,10 @@ const NewShareRoute = require("./routes/app/newShare");
 const SingleShareRoute = require("./routes/app/singleShare");
 const userchatsRoute = require("./routes/app/userChats");
 
+// knowledgeBase route
+const addToStoreRoute = require("./routes/app/knowledgeBase/_addToStore");
+const queryStoreRoute = require("./routes/app/knowledgeBase/_queryStore");
+
 // auth routes
 const NewUserRoute = require("./routes/auth/newUser");
 
@@ -23,7 +27,7 @@ app.use(cookieParser());
 
 // cors
 let alloweds = {
-  origin: [process.env.DOMAIN, process.env.PUBLINK],
+  origin: [process.env.DOMAIN, process.env.PUBLINK, process.env.PUBLINKLIVE],
 };
 app.use(
   cors({
@@ -36,7 +40,7 @@ app.use(
 // set headers globally
 app.use((req, res, next) => {
   const origin =
-    alloweds.origin.includes(req.header("origin").toLowerCase()) &&
+    alloweds?.origin?.includes(req.header("origin")?.toLowerCase()) &&
     req.headers.origin;
   res.header("Access-Control-Allow-Origin", origin);
   res.set({
@@ -65,7 +69,6 @@ app.get("/", (req, res) => {
     @desc: new share
     @method: POST
     @privacy: public
-    @endpoint: /api/new-share
 */
 app.use("/api/new-share", NewShareRoute);
 
@@ -73,7 +76,6 @@ app.use("/api/new-share", NewShareRoute);
     @desc: single share
     @method: POST
     @privacy: public
-    @endpoint: /api/single-share
 */
 app.use("/api/single-share", SingleShareRoute);
 
@@ -81,7 +83,6 @@ app.use("/api/single-share", SingleShareRoute);
     @desc: single share
     @method: POST
     @privacy: public
-    @endpoint: /api/single-share
 */
 app.use("/api/new-user", NewUserRoute);
 
@@ -89,9 +90,22 @@ app.use("/api/new-user", NewUserRoute);
     @desc: single user chats
     @method: POST
     @privacy: public
-    @endpoint: /api/user-chats
 */
 app.use("/api/user-chats", userchatsRoute);
+
+/*   
+    @desc: chunck, embedds, store context
+    @method: POST
+    @privacy: public
+*/
+app.use("/api/new-context", addToStoreRoute);
+
+/*   
+    @desc: query the context
+    @method: POST
+    @privacy: public
+*/
+app.use("/api/new-query", queryStoreRoute);
 
 app.listen(process.env.PORT, () =>
   console.log(`app listen on port ${process.env.PORT}`)
