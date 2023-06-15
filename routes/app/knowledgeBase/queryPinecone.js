@@ -1,6 +1,6 @@
 // this file take as input a vector (query) and search for the right data from pinecone return a array of resutls
 
-const queryPinecone = async (queryVector, uid, contextId) => {
+const queryPinecone = async (queryVector, uid, contextIdArr) => {
   try {
     let headers = new Headers();
     headers.append("Api-Key", process.env.PINECONE_KEY);
@@ -10,14 +10,14 @@ const queryPinecone = async (queryVector, uid, contextId) => {
       vector: queryVector,
       filter: {
         contextId: {
-          $eq: contextId,
+          $in: contextIdArr,
         },
         uid: {
           $eq: uid,
         },
       },
       namespace: uid,
-      topK: 3,
+      topK: 5,
       includeMetadata: true,
     };
 

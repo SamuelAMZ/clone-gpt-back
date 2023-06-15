@@ -10,7 +10,6 @@ const queryPinecone = require("./queryPinecone");
 
 // general helpers
 const isUserExist = require("../helpers/searchForUser");
-const isContextExist = require("../helpers/searchForContext");
 
 // library
 const Joi = require("@hapi/joi");
@@ -18,18 +17,18 @@ const Joi = require("@hapi/joi");
 const schema = Joi.object({
   uid: Joi.string().required(),
   query: Joi.string().required(),
-  contextId: Joi.string().required(),
+  contextIdArr: Joi.array().required(),
 });
 
 queryStoreRoute.post("/", async (req, res) => {
-  const { uid, query, contextId } = req.body;
+  const { uid, query, contextIdArr } = req.body;
 
   // joi validation sbody data
   try {
     const validation = await schema.validateAsync({
       uid,
       query,
-      contextId,
+      contextIdArr,
     });
   } catch (error) {
     console.log(error.message);
@@ -41,15 +40,6 @@ queryStoreRoute.post("/", async (req, res) => {
   if (!isUser) {
     return res.status(404).json({
       message: "user not found",
-      code: "bad",
-    });
-  }
-
-  // search for the context
-  const aContext = await isContextExist(contextId);
-  if (!aContext) {
-    return res.status(404).json({
-      message: "context not found",
       code: "bad",
     });
   }
@@ -70,7 +60,7 @@ queryStoreRoute.post("/", async (req, res) => {
   const queryResponse = await queryPinecone(
     embeddingsFromOpenAi[0],
     uid,
-    contextId
+    contextIdArr
   );
   if (!queryResponse) {
     return res.status(400).json({

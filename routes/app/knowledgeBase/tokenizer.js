@@ -3,7 +3,7 @@ const tokenizer = (text, type) => {
   const tokens = text.split(/\s+/); // Splitting the text by whitespace
   const length = tokens.length;
 
-  if (type === "upserting" && length > 10000) {
+  if (type === "upserting" && length > 50000) {
     return false;
   }
   if (type === "querying" && length > 500) {

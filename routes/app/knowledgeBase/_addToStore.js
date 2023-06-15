@@ -9,6 +9,7 @@ const tokenizer = require("./tokenizer");
 const contextEmbeddings = require("./embeddings");
 const addToPinecone = require("./upsertPinecone");
 const newContext = require("./createContextDb");
+const fetchFileAndParseContennt = require("./parseText");
 
 // general helpers
 const isUserExist = require("../helpers/searchForUser");
@@ -18,19 +19,19 @@ const Joi = require("@hapi/joi");
 
 const schema = Joi.object({
   uid: Joi.string().required(),
-  rawText: Joi.string().required(),
+  fileUrl: Joi.string().required(),
   module: Joi.string().required(),
   name: Joi.string().required(),
 });
 
 addToStoreRoute.post("/", async (req, res) => {
-  const { uid, rawText, module, name } = req.body;
+  const { uid, fileUrl, module, name } = req.body;
 
   // joi validation sbody data
   try {
     const validation = await schema.validateAsync({
       uid,
-      rawText,
+      fileUrl,
       module,
       name,
     });
@@ -48,17 +49,36 @@ addToStoreRoute.post("/", async (req, res) => {
     });
   }
 
+  // fetch text content
+  let textContent;
+  try {
+    textContent = await fetchFileAndParseContennt(fileUrl, module);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: "error parsing text",
+      code: "bad",
+    });
+  }
+
+  if (!textContent) {
+    return res.status(400).json({
+      message: "no text parsed from file",
+      code: "bad",
+    });
+  }
+
   // check text size
-  const textSize = tokenizer(rawText, "upserting");
+  const textSize = tokenizer(textContent, "upserting");
   if (!textSize) {
     return res.status(400).json({
-      message: "above the token limit 10k",
+      message: "above the token limit 50k",
       code: "bad",
     });
   }
 
   // chunk texts
-  const chunks = await chunker(rawText);
+  const chunks = await chunker(textContent);
 
   // create db record for the context
   const contextId = await newContext({
@@ -66,7 +86,8 @@ addToStoreRoute.post("/", async (req, res) => {
     name,
     size: textSize,
     module,
-    preview: rawText.slice(0, 150),
+    preview: textContent.slice(0, 150),
+    previewLink: fileUrl,
   });
   if (!contextId) {
     return res.status(500).json({
