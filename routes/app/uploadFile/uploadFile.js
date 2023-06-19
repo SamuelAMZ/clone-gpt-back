@@ -12,7 +12,7 @@ const uploadFileToBucket = require("../helpers/uploadFileToBucket");
 const multer = Multer({
   storage: Multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // no larger than 5mb
+    fileSize: 100 * 1024 * 1024, // no larger than 100mb
   },
 });
 
