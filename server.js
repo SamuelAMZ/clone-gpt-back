@@ -24,6 +24,12 @@ const activeContextsListRoute = require("./routes/app/knowledgeBase/_activeConte
 const uploadFileRoute = require("./routes/app/uploadFile/uploadFile");
 const createAndUploadText = require("./routes/app/uploadFile/createTextFileAndUpload");
 
+// scraping routes
+const createNewJobRoute = require("./routes/app/scrapingJob/_createNewJob");
+const setJobstatusToDoneRoute = require("./routes/app/scrapingJob/_setJobDone");
+const saveScrapingJobData = require("./routes/app/scrapingJob/_saveScrapingData");
+const getJobDataRoute = require("./routes/app/scrapingJob/_getJobData");
+
 // auth routes
 const NewUserRoute = require("./routes/auth/newUser");
 
@@ -36,7 +42,15 @@ let alloweds = {
 };
 app.use(
   cors({
-    origin: alloweds.origin,
+    origin: (origin, callback) => {
+      // Check if the origin is allowed
+      if (alloweds.origin.includes(origin)) {
+        callback(null, true);
+      } else {
+        // callback(new Error("Not allowed by CORS"));
+        callback(null, true);
+      }
+    },
     credentials: true,
     optionSuccessStatus: 200,
   })
@@ -44,9 +58,11 @@ app.use(
 
 // set headers globally
 app.use((req, res, next) => {
-  const origin =
-    alloweds?.origin?.includes(req.header("origin")?.toLowerCase()) &&
-    req.headers.origin;
+  // const origin =
+  //   alloweds?.origin?.includes(req.header("origin")?.toLowerCase()) &&
+  //   req.headers.origin;
+  const origin = req.headers.origin;
+  // console.log(origin);
   res.header("Access-Control-Allow-Origin", origin);
   res.set({
     "Access-Control-Allow-Credentials": true,
@@ -64,7 +80,7 @@ app.use((req, res, next) => {
 app.use("/api/upload-file", uploadFileRoute);
 
 // body parsing
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json({ limit: "100mb" }));
 // cookies
 app.use(cookieParser());
 
@@ -165,6 +181,34 @@ app.use("/api/active-contexts", activeContextsListRoute);
     @privacy: public
 */
 app.use("/api/create-file-then-upload", createAndUploadText);
+
+/*   
+    @desc: create a new scraping job
+    @method: POST
+    @privacy: public
+*/
+app.use("/api/new-scraping-job", createNewJobRoute);
+
+/*   
+    @desc: set job to done
+    @method: POST
+    @privacy: public
+*/
+app.use("/api/job-done", setJobstatusToDoneRoute);
+
+/*   
+    @desc: save scraping data
+    @method: POST
+    @privacy: public
+*/
+app.use("/api/save-scraping-data", saveScrapingJobData);
+
+/*   
+    @desc: get job data
+    @method: POST
+    @privacy: public
+*/
+app.use("/api/get-job-data", getJobDataRoute);
 
 app.listen(process.env.PORT, () =>
   console.log(`app listen on port ${process.env.PORT}`)

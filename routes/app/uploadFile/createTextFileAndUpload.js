@@ -2,11 +2,8 @@
 const express = require("express");
 const createAndUploadText = express.Router();
 
-// gcp storage
-const { Storage } = require("@google-cloud/storage");
-
-// node apis
-const url = require("url");
+// helpers
+const createAndUploadTextFile = require("./uploadTextFileHelper");
 
 // library
 const Joi = require("@hapi/joi");
@@ -29,23 +26,10 @@ createAndUploadText.post("/", async (req, res) => {
     return;
   }
 
-  //   create file
-  // upload file
-  const storage = new Storage();
-  const bucketName = "contexts_storage";
-  const bucket = storage.bucket(bucketName);
-  const fileName = `${Date.now()}-contextfile.txt`;
-  const file = bucket.file(fileName);
-  await file.save(fileContent, { contentType: "text/plain" });
-
-  const uploadedFileName = file.name;
-  const fileUrl = `https://storage.googleapis.com/${bucketName}/${uploadedFileName}`;
-
-  const parsedUrl = url.parse(fileUrl);
-  const transformedUrl = `${parsedUrl.protocol}//${parsedUrl.host}${parsedUrl.pathname}`;
+  const { url, name } = await createAndUploadTextFile(fileContent);
 
   // send response
-  res.status(201).json({ url: transformedUrl, name: uploadedFileName });
+  res.status(201).json({ url, name });
 });
 
 module.exports = createAndUploadText;

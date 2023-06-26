@@ -17,7 +17,7 @@ const queryPinecone = async (queryVector, uid, contextIdArr) => {
         },
       },
       namespace: uid,
-      topK: 5,
+      topK: 10,
       includeMetadata: true,
     };
 

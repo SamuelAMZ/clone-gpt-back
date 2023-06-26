@@ -32,7 +32,10 @@ contextsListRoute.post("/", async (req, res) => {
 
   //   search for slug in contexts collection
   try {
-    const contextsList = await Contexts.find({ uid: uid }, { slug: 1, name: 1 })
+    const contextsList = await Contexts.find(
+      { uid: uid, state: false },
+      { state: 1, name: 1, module: 1 }
+    )
       .sort({ createdAt: -1 })
       .skip(Number(page) * Number(perPage))
       .limit(Number(perPage));

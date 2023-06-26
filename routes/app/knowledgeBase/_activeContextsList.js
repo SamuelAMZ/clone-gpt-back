@@ -32,7 +32,7 @@ activeContextsListRoute.post("/", async (req, res) => {
   try {
     const contextsList = await Contexts.find(
       { uid: uid, state: true },
-      { name: 1, state: 1 }
+      { name: 1, state: 1, module: 1 }
     )
       .sort({ updateAt: -1 })
       .skip(Number(page) * Number(perPage))
