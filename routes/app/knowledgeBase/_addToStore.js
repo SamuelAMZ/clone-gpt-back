@@ -72,7 +72,7 @@ addToStoreRoute.post("/", async (req, res) => {
   const textSize = tokenizer(textContent, "upserting");
   if (!textSize) {
     return res.status(400).json({
-      message: "above the token limit 50k",
+      message: "above the token limit 500k",
       code: "bad",
     });
   }
